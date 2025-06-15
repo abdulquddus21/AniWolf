@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AniWolf - Katalog</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="website icon" type="png" href="./aniwolf.jpg">
+
+  <style>
+    :root {
+      --primary: #6a5acd;
+      --secondary: #483d8b;
+      --dark: #1a1a2e;
+      --light-dark: #16213e;
+      --text: #e6e6fa;
+      --card-bg: #0f3460;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+    }
+
+    body {
+      background-color: var(--dark);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 1rem 1.5rem;
+      border-radius: 5px;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 1002;
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: slideIn 0.3s forwards, slideOut 0.3s 2.7s forwards;
+    }
+
+    .toast.success { background-color: #2ed573; }
+    .toast.error { background-color: #ff4757; }
+    .toast.warning { background-color: #ffa502; }
+
+    @keyframes slideIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideOut {
+      to { opacity: 0; transform: translateY(-20px); }
+    }
+
+    header {
+      background-color: var(--light-dark);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo img {
+      height: 50px;
+      width: 50px;
+      border-radius: 50px;
+    }
+
+    .logo h4 {
+      color: white;
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .logo h4 span {
+      color: #ff4757;
+    }
+
+    .search-container {
+      position: relative;
+      width: 300px;
+    }
+
+    #search {
+      width: 100%;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      border: none;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+      padding-left: 35px;
+      margin-top: 5px;
+      margin-bottom: 20px;
+    }
+
+    .search-container i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-92%);
+      color: var(--text);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .auth-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .login-btn {
+      background-color: transparent;
+      color: var(--text);
+      border: 1px solid var(--primary);
+    }
+
+    .login-btn:hover {
+      background-color: var(--primary);
+    }
+
+    .register-btn {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .register-btn:hover {
+      background-color: #7b68ee;
+    }
+
+    .profile-btn {
+      background-color: var(--light-dark);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .profile-btn:hover {
+      background-color: var(--primary);
+    }
+
+    .logout-btn {
+      background-color: #ff4757;
+      color: white;
+    }
+
+    .logout-btn:hover {
+      background-color: #ff6b81;
+    }
+
+    main {
+      flex: 1;
+      padding: 2rem;
+    }
+
+    .section-title {
+      margin-bottom: 2rem;
+      font-size: 1.8rem;
+      color: #adaaaa;
+      position: relative;
+      display: inline-block;
+      margin-left: 10px;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 50%;
+      height: 3px;
+      background-color: var(--primary);
+    }
+
+    .anime-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      padding: 0;
+    }
+
+    .anime-card {
+      background-color: var(--card-bg);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+    }
+
+    .anime-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .anime-img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+    }
+
+    .anime-info {
+      padding: 0.5rem;
+    }
+
+    .anime-title {
+      font-size: 0.9rem;
+      margin-bottom: 0.3rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .anime-genre {
+      display: inline-block;
+      background-color: var(--primary);
+      color: white;
+      padding: 0.1rem 0.3rem;
+      border-radius: 10px;
+      font-size: 0.6rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .anime-desc {
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 0.5rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .anime-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .favorite-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: color 0.3s, transform 0.3s;
+    }
+
+    .favorite-btn.active {
+      color: #ff4757;
+      transform: scale(1.1);
+    }
+
+    .favorite-btn:hover {
+      transform: scale(1.2);
+    }
+
+    .view-btn {
+      background: radial-gradient(circle, rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 48%, rgba(0, 212, 255, 1) 100%);
+      color: white;
+      border: none;
+      padding: 0.3rem 0.8rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background-color 0.3s;
+    }
+
+    .view-btn:hover {
+      background: #020024;
+    }
+
+    .bottom-nav1 {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--dark);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    padding: 0.5rem 0;
+  }
+
+  .nav-links1 {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .nav-item1 {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.5rem;
+    transition: color 0.3s;
+  }
+
+  .nav-item i {
+    font-size: 1.3rem;
+  }
+
+  .nav-item1.active {
+    
+  }
+
+  .nav-item1:hover {
+    color: var(--secondary);
+  }
+
+  @media (min-width: 769px) {
+    .bottom-nav1 {
+      display: none;
+    }
+  }
+
+  .nav-item1.abul{
+    color: #6a5acd;
+  }
+
+   
+
+    @media (max-width: 768px) {
+      .nav-links, .auth-buttons {
+        display: none;
+      }
+
+      .search-container {
+        width: 200px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header {
+        padding: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .logo {
+        order: 1;
+      }
+
+      .search-container {
+        order: 3;
+        width: 100%;
+      }
+
+      .anime-card {
+        flex: 0 0 150px;
+      }
+
+      .anime-img {
+        height: 120px;
+      }
+
+      .section-title {
+        font-size: 23px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <a href="./index.html">
+        <img src="./aniwolf.jpg" alt="">
+      </a>
+      <h4>Ani<span>Wolf</span></h4>
+    </div>
+
+   
+
+    <nav class="nav-links">
+      <a href="index.html"><i class="fa-solid fa-house"></i> Bosh sahifa</a>
+      <a href="favorites.html"><i class="fa-solid fa-heart"></i> Sevimlilar</a>
+      <a href="account.html"><i class="fa-solid fa-sliders"></i> Profile</a>
+      <a href="#" id="admin-link"><i class="fa-solid fa-user-tie"></i> Admin</a>
+    </nav>
+
+    <div class="auth-buttons">
+      <button class="auth-btn login-btn" id="login-btn">Kirish</button>
+      <button class="auth-btn register-btn" id="register-btn">Ro'yxatdan o'tish</button>
+    </div>
+  </header>
+
+  
+
+  <nav class="bottom-nav1" id="bottom-nav">
+    <div class="nav-links1">
+      <a href="index.html" class="nav-item1">
+        <i class="fas fa-home"></i>
+        <span>Bosh sahifa</span>
+      </a>
+      <a href="search.html" class="nav-item1 active abul">
+        <i class="fas fa-search"></i>
+        <span>Qidirish</span>
+      </a>
+      <a href="favorites.html" class="nav-item1">
+        <i class="fas fa-heart"></i>
+        <span>Sevimlilar</span>
+      </a>
+      <a href="account.html" class="nav-item1">
+        <i class="fas fa-user"></i>
+        <span>Akaunt</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main>
+    <div class="search-container">
+      <i class="fas fa-search"></i>
+      <input type="text" id="search" placeholder="Anime qidirish...">
+    </div>
+    <div class="anime-section">
+      <h1 class="section-title">Katalog</h1>
+      <div class="anime-grid" id="catalog-container"></div>
+    </div>
+  </main>
+
+  <script>
+    let animeList = [
+      { id: 1, name: "Naruto", genre: "Action", desc: "12 yoshli Naruto Uzumaki jinchuriki bo'lib, uzoq vaqt davomida hurmatga sazovor bo'lish uchun kurashadi.", image: "https://m.media-amazon.com/images/I/81L94vkJmXL._AC_UL480_FMwebp_QL65_.jpg" },
+      { id: 2, name: "Attack on Titan", genre: "Action", desc: "Insoniyat devorlar ichida yashaydi, ulardan tashqarida ularni yeb yuboradigan titanlar yashaydi.", image: "https://m.media-amazon.com/images/M/MV5BMTY5ODk1NzUyMl5BMl5BanBnXkFtZTgwMjUyNzEyMTE@._V1_FMjpg_UX1000_.jpg" },
+      { id: 3, name: "Demon Slayer", genre: "Action", desc: "Tanjiro Kamado o'z oilasini himoya qilish uchun iblis ovchisi bo'ladi.", image: "https://m.media-amazon.com/images/I/51njzqvT4ZL._AC_UL480_FMwebp_QL65_.jpg" },
+      { id: 4, name: "My Hero Academia", genre: "Action", desc: "Izuku Midoriya super qahramon bo'lishni orzu qiladi.", image: "https://m.media-amazon.com/images/I/91pyoTZQcML._AC_UL480_FMwebp_QL65_.jpg" },
+      { id: 5, name: "Jujutsu Kaisen", genre: "Action", desc: "Yuji Itadori la'natlangan ruhlar bilan kurashadi.", image: "https://m.media-amazon.com/images/S/al-na-9d5791cf-3faf/f96a1751-86f6-4240-86a8-92a86044a9f2._CR0,22,2400,1257_SX920_CB1169409_QL70_.jpg" },
+      { id: 6, name: "Tokyo Revengers", genre: "Action", desc: "Takemichi o'tmishga qaytib, do'stlarini qutqarishga harakat qiladi.", image: "https://m.media-amazon.com/images/I/51dfaTXP1OL._SX300_SY300_QL7_FMwebp_.jpg" },
+      { id: 7, name: "Black Clover", genre: "Action", desc: "Asta sehrsiz dunyoda sehrgar bo'lishni orzu qiladi.", image: "https://i0.wp.com/twincitiesgeek.com/wp-content/uploads/2018/02/black-clover-banner.jpg?ssl=1" },
+      { id: 8, name: "One Punch Man", genre: "Action", desc: "Saitama bitta zarba bilan har qanday dushmanni yengadi.", image: "https://sm.ign.com/ign_in/screenshot/default/one-punch-man-season-3_mw8f.jpg" },
+      { id: 9, name: "Mob Psycho 100", genre: "Action", desc: "Shigeo Kageyama o'zining psixik kuchlarini boshqarishga harakat qiladi.", image: "https://m.media-amazon.com/images/S/pv-target-images/e4c340e9cd882d8e2e8db3ab4b87b7d359f4e45274fd7544a989657c7c1da23d._BR-6_AC_SX720_FMwebp_.jpg" },
+      { id: 10, name: "Dragon Ball Z", genre: "Action", desc: "Goku va do'stlari sayyorani himoya qiladi.", image: "https://m.media-amazon.com/images/I/91pyoTZQcML._AC_UY327_FMwebp_QL65_.jpg" },
+      { id: 11, name: "Gintama", genre: "Action", desc: "Gintoki Sakata kulgili va jangari sarguzashtlarda qatnashadi.", image: "https://m.media-amazon.com/images/S/pv-target-images/37aec2c8be55ac74e45606c289529785ae706b4d48bb85f6bd3c84f4cb05a467._BR-6_AC_SX720_FMwebp_.jpg" },
+      { id: 12, name: "Spy x Family", genre: "Action", desc: "Twilight o'z oilasini yashirin topshiriqlar bilan boshqaradi.", image: "https://m.media-amazon.com/images/S/pv-target-images/73801b57744108cb80bd8072a9413df04c08173eb734e4a606ba459dfc508f59._BR-6_AC_SX720_FMwebp_.jpg" },
+      { id: 13, name: "Kubo Won't Let Me Be Invisible", genre: "Action", desc: "Nagata ko'rinmas bo'lib, hayotini muvozanatlashga harakat qiladi.", image: "https://m.media-amazon.com/images/S/pv-target-images/9e003ebe0060eef674c70e9edd3f32b5be275508662cc1396c5900b1226478cb._BR-6_AC_SX720_FMwebp_.jpg" },
+      { id: 14, name: "Bleach", genre: "Action", desc: "Ichigo Kurosaki shinigami sifatida ruhlarni himoya qiladi.", image: "https://m.media-amazon.com/images/I/71triFyBxyL._AC_UL480_FMwebp_QL65_.jpg" },
+      { id: 15, name: "Chainsaw Man", genre: "Action", desc: "Denji iblis ovchisi sifatida hayot kechiradi.", image: "https://m.media-amazon.com/images/I/81xZ25gNNEL._AC_UL480_FMwebp_QL65_.jpg" },
+      { id: 16, name: "One Piece", genre: "Adventure", desc: "Luffy va uning jamoasi One Piece xazinasini qidiradi.", image: "https://m.media-amazon.com/images/I/91DSqxPCfeL._AC_UY327_FMwebp_QL65_.jpg" },
+      { id: 17, name: "Hunter x Hunter", genre: "Adventure", desc: "Gon Freecss ovchi bo'lishni orzu qiladi.", image: "https://m.media-amazon.com/images/S/pv-target-images/217cd74b1df26114f43449e110c90fd1290429d6044533cfee1b85f54617b4f7._BR-6_AC_SX720_FMwebp_.jpg" },
+      { id: 18, name: "Fullmetal Alchemist", genre: "Adventure", desc: "Edvard va Alfonse Elric alkimyo dunyosida sarguzashtlarni boshdan kechiradi.", image: "https://m.media-amazon.com/images/S/pv-target-images/b743d74a9526c5f3fe7c9189c053166a453ae3000d13669e189193db60d9510a._BR-6_AC_SX720_FMwebp_.jpg" },
+      { id: 19, name: "Fairy Tail", genre: "Adventure", desc: "Natsu Dragneel va uning jamoasi sehrli dunyoda vazifalarni bajaradi.", image: "https://m.media-amazon.com/images/I/91492e-f2-L._AC_UY327_FMwebp_QL65_.jpg" },
+      { id: 20, name: "Sword Art Online", genre: "Adventure", desc: "Kirito virtual o'yin dunyosida omon qolishga harakat qiladi.", image: "https://m.media-amazon.com/images/S/pv-target-images/77cc28ad78d959248a01163a780c744dbd74b0c8adb773193dcc27bd524cefff._BR-6_AC_SX720_FMwebp_.jpg" },
+      { id: 21, name: "Vinland Saga", genre: "Adventure", desc: "Thorfinn otasining o'limi uchun qasos olishga intiladi.", image: "https://m.media-amazon.com/images/I/81AaErFcDUL._AC_UL480_FMwebp_QL65_.jpg" },
+      { id: 22, name: "Cowboy Bebop", genre: "Adventure", desc: "Spike Spiegel va uning jamoasi mukofot ovchilari sifatida ishlaydi.", image: "https://m.media-amazon.com/images/S/pv-target-images/351d5ca6c26a3f6ccf19d1ccdc80f456516e21fb6b5f9a9a83ae0302fcb3867a._BR-6_AC_SX720_FMwebp_.jpg" },
+      { id: 23, name: "Dr. Stone", genre: "Adventure", desc: "Senku ilmiy bilimlari orqali sivilizatsiyani qayta quradi.", image: "https://m.media-amazon.com/images/S/pv-target-images/036e40e4b762ebd606751c241dfb185de5675780bad41ab487817e1e0eb1e628._BR-6_AC_SX720_FMwebp_.jpg" },
+      { id: 24, name: "Hunter x Hunter (2011)", genre: "Adventure", desc: "Gon Freecss ovchi bo‘lish yo‘lida davom etadi.", image: "https://m.media-amazon.com/images/I/81KDv3MIbPL._AC_UY327_FMwebp_QL65_.jpg" },
+      { id: 25, name: "Made in Abyss", genre: "Adventure", desc: "Riko va Reg chuqur tubsizlikka sayohat qiladi.", image: "https://m.media-amazon.com/images/I/81KO1MCe4hL._AC_UY327_FMwebp_QL65_.jpg" },
+      { id: 26, name: "The Seven Deadly Sins", genre: "Adventure", desc: "Meliodas va uning jamoasi qirollikni qutqaradi.", image: "https://m.media-amazon.com/images/I/71Ufx5FGugL._AC_UL480_FMwebp_QL65_.jpg" },
+      { id: 27, name: "Death Note", genre: "Mystery", desc: "Light Yagami o'lim daftarini topib, dunyoni o'zgartirishga harakat qiladi.", image: "https://m.media-amazon.com/images/S/pv-target-images/b1424bdb31fb516a44cae343b0c4423fc7aa56f7f2496e154fa81b37fefcf0cc._BR-6_AC_SX720_FMwebp_.jpg" },
+      { id: 28, name: "Steins;Gate", genre: "Mystery", desc: "Okabe va uning do'stlari vaqt sayohati bilan tajriba o'tkazadi.", image: "https://m.media-amazon.com/images/I/71It5k06pGL._AC_UY327_FMwebp_QL65_.jpg" },
+      { id: 29, name: "Code Geass", genre: "Mystery", desc: "Lelouch Geass kuchi yordamida inqilob boshlaydi.", image: "https://m.media-amazon.com/images/S/pv-target-images/2665866f77df431d4eda72f26ec921126c016456d5778b196449c95669eefafe._BR-6_AC_SX720_FMwebp_.jpg" },
+      { id: 30, name: "Re:Zero", genre: "Mystery", desc: "Subaru boshqa dunyoda o'limdan qaytish qobiliyatiga ega.", image: "https://m.media-amazon.com/images/S/pv-target-images/a54907f29a9d89e4c6b661ae53343a3bbd6fed51f0deede2e00979c03c982cee._BR-6_AC_SX720_FMwebp_.jpg" },
+      { id: 31, name: "Neon Genesis Evangelion", genre: "Mystery", desc: "Shinji Ikari Eva robotlarini boshqarib, dunyoni himoya qiladi.", image: "https://m.media-amazon.com/images/S/pv-target-images/6aeb860bb0a866b8310d2976f091f94e07988b6d23742ccdc6a195d22e9178aa._UR300,300_BL99_UR640,360_CLs%7C640,360%7C/6aeb860bb0a866b8310d2976f091f94e07988b6d23742ccdc6a195d22e9178aa.jpg%7C0,0,640,360+0,0,640,360_BR-6_AC_SX720_FMwebp_.jpg" },
+      { id: 32, name: "Ergo Proxy", genre: "Mystery", desc: "Re-l Mayer distopik dunyoda sirli voqealarni ochadi.", image: "https://m.media-amazon.com/images/S/pv-target-images/01172386b971c66dfea00b9018e1143b186893904eb9a1028c0e42fdfc2a9fac._BR-6_AC_SX720_FMwebp_.jpg" },
+      { id: 33, name: "Psycho-Pass", genre: "Mystery", desc: "Tsunemori Akane jinoyatlar dunyosida ishlaydi.", image: "https://m.media-amazon.com/images/I/81L94vkJmXL._AC_UL480_FMwebp_QL65_.jpg" },
+      { id: 34, name: "Paranoia Agent", genre: "Mystery", desc: "Sirli hujumlar Tokioda sodir bo‘ladi.", image: "https://m.media-amazon.com/images/S/pv-target-images/bc9191063eb675d42812631139b611085ab99568ea13d76b4120bb2c095719db._BR-6_AC_SX720_FMwebp_.jpg" },
+      { id: 35, name: "Monster", genre: "Mystery", desc: "Doktor Tenma o‘z hayotini xavf ostiga qo‘yadi.", image: "https://m.media-amazon.com/images/I/51I26I+pe0L._AC_UY327_FMwebp_QL65_.jpg" },
+      { id: 36, name: "Haikyuu", genre: "Sports", desc: "Hinata voleybol jamoasida muvaffaqiyatga erishishga harakat qiladi.", image: "https://m.media-amazon.com/images/S/pv-target-images/03cac0f366372e4af0db23d46c7da0ee357d60690ef269eba348fa88418eb5e9._BR-6_AC_SX720_FMwebp_.jpg" },
+      { id: 37, name: "Yuri on Ice", genre: "Sports", desc: "Yuri Katsuki muz konkida uchish bo'yicha musobaqalarda ishtirok etadi.", image: "https://m.media-amazon.com/images/S/pv-target-images/b0b7886740dc15a462e9588d88d6a843e1abe1eb0c96884f4fc87aee79388fee._BR-6_AC_SX720_FMwebp_.jpg" },
+      { id: 38, name: "Blue Lock", genre: "Sports", desc: "Futbolchilar dunyodagi eng yaxshi hujumchi bo'lish uchun kurashadi.", image: "https://m.media-amazon.com/images/S/pv-target-images/69481f020bfc8b018f65301cd4b2a771da6777500dc3109d7c8eae8cb6f29c21._BR-6_AC_SX720_FMwebp_.png" },
+      { id: 39, name: "Kuroko's Basketball", genre: "Sports", desc: "Kuroko Tetsuya basketbol jamoasida o‘ynaydi.", image: "https://m.media-amazon.com/images/I/71a1eYbVVdL._AC_UY327_FMwebp_QL65_.jpg" },
+      { id: 40, name: "Run with the Wind", genre: "Sports", desc: "Yosh yuguruvchilar jamoa sifatida rivojlanadi.", image: "https://m.media-amazon.com/images/I/71QhzsjN5yL._AC_UY327_FMwebp_QL65_.jpg" },
+      { id: 41, name: "Ping Pong: The Animation", genre: "Sports", desc: "Ping-pong o‘yinlari orqali hayotiy saboqlar o‘rganiladi.", image: "https://m.media-amazon.com/images/I/71VCPkXOyHL._AC_UY327_FMwebp_QL65_.jpg" },
+      { id: 42, name: "Ace of Diamond", genre: "Sports", desc: "Beyzbol jamoasi chempionatga tayyorgarlik ko‘radi.", image: "https://m.media-amazon.com/images/I/71k-oAc8X2L._AC_UY327_FMwebp_QL65_.jpg" }
+    ];
+
+    let users = JSON.parse(localStorage.getItem('users')) || [
+      { id: 1, name: "Admin", email: "admin@yugendub.com", password: "admin123", isAdmin: true }
+    ];
+
+    let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+
+    const catalogContainer = document.getElementById('catalog-container');
+    const searchInput = document.getElementById('search');
+    const loginBtn = document.getElementById('login-btn');
+    const registerBtn = document.getElementById('register-btn');
+
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i> ${message}`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    function init() {
+      loadAnimeCards();
+      loadEventListeners();
+      checkAuth();
+    }
+
+    function loadAnimeCards() {
+      catalogContainer.innerHTML = '';
+      animeList.forEach(anime => {
+        const isFavorite = favorites.some(fav => fav.id === anime.id);
+        catalogContainer.innerHTML += `
+          <div class="anime-card" data-id="${anime.id}">
+            <img src="${anime.image}" alt="${anime.name}" class="anime-img">
+            <div class="anime-info">
+              <h3 class="anime-title">${anime.name}</h3>
+              <span class="anime-genre">${anime.genre}</span>
+              <p class="anime-desc">${anime.desc}</p>
+              <div class="anime-actions">
+                <button class="favorite-btn ${isFavorite ? 'active' : ''}" data-id="${anime.id}">
+                  <i class="fas fa-heart"></i>
+                </button>
+                <button class="view-btn">Ko'rish</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function checkAuth() {
+      const authButtons = document.querySelector('.auth-buttons');
+      if (currentUser) {
+        loginBtn.style.display = 'none';
+        registerBtn.style.display = 'none';
+
+        authButtons.innerHTML = `
+          <button class="auth-btn profile-btn">
+            <i class="fas fa-user"></i> ${currentUser.name}
+          </button>
+          <button class="auth-btn logout-btn" id="logout-btn">Chiqish</button>
+        `;
+        document.getElementById('logout-btn').addEventListener('click', handleLogout);
+      } else {
+        loginBtn.style.display = 'block';
+        registerBtn.style.display = 'block';
+
+        authButtons.innerHTML = `
+          <button class="auth-btn login-btn" id="login-btn">Kirish</button>
+          <button class="auth-btn register-btn" id="register-btn">Ro'yxatdan o'tish</button>
+        `;
+      }
+    }
+
+    function toggleFavorite(animeId) {
+      const anime = animeList.find(a => a.id === animeId);
+      if (!anime) return;
+
+      const index = favorites.findIndex(fav => fav.id === animeId);
+      if (index === -1) {
+        favorites.push({ id: anime.id, name: anime.name, genre: anime.genre, desc: anime.desc, image: anime.image });
+        showToast(`${anime.name} sevimlilarga qo\'shildi!`, 'success');
+      } else {
+        favorites.splice(index, 1);
+        showToast(`${anime.name} sevimlilardan o\'chirildi!`, 'warning');
+      }
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      loadAnimeCards();
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      localStorage.removeItem('currentUser');
+      checkAuth();
+      showToast('Chiqish muvaffaqiyatli!', 'success');
+    }
+
+    function loadEventListeners() {
+      searchInput.addEventListener('input', filterAnime);
+
+      loginBtn.addEventListener('click', () => {
+        // Login modal logikasi bu yerda bo‘lardi, lekin faqat asosiy funksiyani saqlaymiz
+        showToast('Login funksiyasi hozircha mavjud emas!', 'warning');
+      });
+
+      registerBtn.addEventListener('click', () => {
+        // Register modal logikasi bu yerda bo‘lardi, lekin faqat asosiy funksiyani saqlaymiz
+        showToast('Register funksiyasi hozircha mavjud emas!', 'warning');
+      });
+
+      catalogContainer.addEventListener('click', (e) => {
+        const favoriteBtn = e.target.closest('.favorite-btn');
+        if (favoriteBtn) {
+          const animeId = parseInt(favoriteBtn.getAttribute('data-id'));
+          toggleFavorite(animeId);
+          favoriteBtn.classList.toggle('active');
+        }
+      });
+    }
+
+    function filterAnime() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const cards = document.querySelectorAll('.anime-card');
+
+      cards.forEach(card => {
+        const title = card.querySelector('.anime-title').textContent.toLowerCase();
+        const genre = card.querySelector('.anime-genre').textContent.toLowerCase();
+
+        if (title.includes(searchTerm) || genre.includes(searchTerm)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const navLinks = document.querySelectorAll('.nav-item1');
+
+      navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const href = link.getAttribute('href');
+
+          navLinks.forEach(l => l.classList.remove('active'));
+          link.classList.add('active');
+
+          if (href !== '#' && href !== '') {
+            window.location.href = href;
+          }
+        });
+      });
+
+      const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+      navLinks.forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+          link.classList.add('active');
+        }
+      });
+    });
+
+    init();
+  </script>
+</body>
+</html>

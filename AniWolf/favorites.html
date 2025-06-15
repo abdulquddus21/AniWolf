@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AniWolf - Sevimlilar</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="website icon" type="png" href="./aniwolf.jpg">
+  <style>
+    :root {
+      --primary: #6a5acd;
+      --secondary: #483d8b;
+      --dark: #1a1a2e;
+      --light-dark: #16213e;
+      --text: #e6e6fa;
+      --card-bg: #0f3460;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+    }
+
+    body {
+      background-color: var(--dark);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.3s;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 1002;
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: slideIn 0.3s forwards, slideOut 0.3s 2.7s forwards;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .toast.success { background-color: #2ed573; }
+    .toast.error { background-color: #ff4757; }
+    .toast.warning { background-color: #ffa502; }
+
+    @keyframes slideIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideOut {
+      to { opacity: 0; transform: translateY(-20px); }
+    }
+
+    /* Header */
+    header {
+      background-color: var(--light-dark);
+      padding: 0.7rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo i {
+      color: var(--primary);
+      transition: transform 0.3s;
+    }
+
+    .logo:hover i {
+      transform: rotate(20deg);
+    }
+
+    .search-container {
+      position: relative;
+      width: 300px;
+    }
+
+    #search {
+      width: 100%;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      border: none;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+      padding-left: 35px;
+      transition: background-color 0.3s;
+      margin-bottom: 20px;
+    }
+
+    #search:focus {
+      background-color: rgba(255, 255, 255, 0.2);
+      outline: none;
+    }
+
+    .search-container i {
+      position: absolute;
+      left: 12px;
+      top: 33%;
+      transform: translateY(-50%);
+      color: var(--text);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .auth-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .login-btn {
+      background-color: transparent;
+      color: var(--text);
+      border: 1px solid var(--primary);
+    }
+
+    .login-btn:hover {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .register-btn {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .register-btn:hover {
+      background-color: #7b68ee;
+    }
+
+    .profile-btn {
+      background-color: var(--light-dark);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .profile-btn:hover {
+      background-color: var(--primary);
+    }
+
+    .logout-btn {
+      background-color: #ff4757;
+      color: white;
+    }
+
+    .logout-btn:hover {
+      background-color: #ff6b81;
+    }
+
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* Mobile Menu */
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      left: -100%;
+      width: 80%;
+      height: 100vh;
+      background-color: var(--light-dark);
+      z-index: 1000;
+      transition: left 0.3s;
+      padding: 2rem;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .mobile-menu.active {
+      left: 0;
+    }
+
+    .close-menu {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .mobile-nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .mobile-nav-links a {
+      color: white;
+      text-decoration: none;
+      font-size: 1.2rem;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+    }
+
+    .overlay.active {
+      display: block;
+    }
+
+    /* Main Content */
+    main {
+      flex: 1;
+      padding: 1rem;
+    }
+
+    .section-title {
+      margin-bottom: 2rem;
+      font-size: 1.8rem;
+      color: var(--primary);
+      position: relative;
+      display: inline-block;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 50%;
+      height: 3px;
+      background-color: var(--primary);
+    }
+
+    /* Favorites Grid */
+    .favorites-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    .anime-card {
+      background-color: var(--card-bg);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+    }
+
+    .anime-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .anime-img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+
+    .anime-info {
+      padding: 0.8rem;
+    }
+
+    .anime-title {
+      font-size: 1rem;
+      margin-bottom: 0.4rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .anime-genre {
+      display: inline-block;
+      background-color: var(--primary);
+      color: white;
+      padding: 0.2rem 0.5rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .anime-desc {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 0.8rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .anime-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      color: #ff4757;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .remove-btn:hover {
+      transform: scale(1.2);
+    }
+
+    .view-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.2rem 0.6rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: background-color 0.3s;
+    }
+
+    .view-btn:hover {
+      background-color: var(--secondary);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 1.2rem;
+      text-shadow: -3px -1px 11px rgba(9,9,121,1);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    /* Footer */
+    footer {
+      background-color: var(--light-dark);
+      padding: 2rem;
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .social-links a {
+      color: var(--text);
+      font-size: 1.5rem;
+      transition: color 0.3s;
+    }
+
+    .social-links a:hover {
+      color: var(--primary);
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--text);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: var(--primary);
+    }
+
+    .copyright {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.9rem;
+    }
+
+    /* Auth Modals */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1001;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+
+    .modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background-color: var(--light-dark);
+      padding: 2rem;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      position: relative;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .modal-title {
+      margin-bottom: 1.5rem;
+      text-align: center;
+      color: var(--primary);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.7rem;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 0.7rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 1rem;
+      transition: background-color 0.3s;
+    }
+
+    .submit-btn:hover {
+      background-color: var(--secondary);
+    }
+
+    .form-footer {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .form-footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links, .auth-buttons {
+        display: none;
+      }
+
+      .hamburger {
+        display: block;
+      }
+
+      .search-container {
+        width: 200px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header {
+        padding: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .logo {
+        order: 1;
+      }
+
+      .search-container {
+        order: 3;
+        width: 100%;
+      }
+
+      .hamburger {
+        order: 2;
+      }
+
+      .anime-card{
+        height:   270px;
+
+          
+    }
+
+    .anime-img{
+      height: 120px;
+    }
+
+    .anime-info{
+      height: 200px;
+      font-size: 15px;
+    }
+
+    .anime-desc{
+      font-size: 11px;
+      height: 30px;
+    }
+
+    
+  }
+
+    .bottom-nav1 {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: var(--dark);
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      padding: 0.5rem 0;
+    }
+
+    .nav-links1 {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    .nav-item1 {
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+      padding: 0.5rem;
+      transition: color 0.3s;
+    }
+
+    .nav-item i {
+      font-size: 1.3rem;
+    }
+
+    .nav-item1.active {}
+
+    .nav-item1:hover {
+      color: var(--secondary);
+    }
+
+    @media (min-width: 769px) {
+      .bottom-nav1 {
+        display: none;
+      }
+    }
+
+    .nav-item1.abul {
+      color: #6a5acd;
+    }
+
+    .logo img {
+      height: 50px;
+      width: 50px;
+      border-radius: 50px;
+    }
+
+    .logo h4 {
+      color: white;
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .logo h4 span {
+      color: #ff4757;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <nav class="bottom-nav1" id="bottom-nav">
+    <div class="nav-links1">
+      <a href="index.html" class="nav-item1 active">
+        <i class="fas fa-home"></i>
+        <span>Bosh sahifa</span>
+      </a>
+      <a href="./search.html" class="nav-item1">
+        <i class="fas fa-search"></i>
+        <span>Qidirish</span>
+      </a>
+      <a href="favorites.html" class="nav-item1 abul">
+        <i class="fas fa-heart"></i>
+        <span>Sevimlilar</span>
+      </a>
+      <a href="account.html" class="nav-item1">
+        <i class="fas fa-user"></i>
+        <span>Akaunt</span>
+      </a>
+    </div>
+  </nav>
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <a href="./index.html">
+        <img src="./aniwolf.jpg" alt="">
+      </a>
+      <h4>Ani<span>Wolf</span></h4>
+    </div>
+
+    <nav class="nav-links">
+      <a href="index.html"><i class="fa-solid fa-house"></i> Bosh sahifa</a>
+      <a href="favorites.html" class="ab"><i class="fa-solid fa-heart"></i> Sevimlilar</a>
+      <a href="settings.html"><i class="fa-solid fa-sliders"></i> Sozlamalar</a>
+      <a href="#" id="admin-link"><i class="fa-solid fa-user-tie"></i> Admin</a>
+    </nav>
+
+    <div class="auth-buttons">
+      <button class="auth-btn login-btn" id="login-btn">Kirish</button>
+      <button class="auth-btn register-btn" id="register-btn">Ro'yxatdan o'tish</button>
+    </div>
+
+    <button class="hamburger" id="hamburger">
+      <i class="fas fa-bars"></i>
+    </button>
+  </header>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <button class="close-menu" id="close-menu">
+      <i class="fas fa-times"></i>
+    </button>
+    <div class="mobile-nav-links">
+      <a href="index.html">Bosh sahifa</a>
+      <a href="favorites.html">Sevimlilar</a>
+      <a href="settings.html">Sozlamalar</a>
+      <a href="#" id="mobile-admin-link">Admin</a>
+      <a href="#" id="mobile-login-btn">Kirish</a>
+      <a href="#" id="mobile-register-btn">Ro'yxatdan o'tish</a>
+      <a href="#" id="mobile-logout-btn" style="display: none;">Chiqish</a>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Main Content -->
+  <main>
+    <div class="search-container">
+      <i class="fas fa-search"></i>
+      <input type="text" id="search" placeholder="Sevimlilarni qidirish...">
+    </div>
+    <div class="favorites-section">
+      <h1 class="section-title">Sevimli Animelar</h1>
+      <div class="favorites-grid" id="favorites-container"></div>
+      <div class="empty-state" id="empty-state" style="display: none;">
+        <i class="fas fa-heart-broken"></i>
+        <p>Hozircha sevimli animelar yo'q. Bosh sahifadan qo'shing!</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <div class="social-links">
+        <a href="https://t.me/yugendub"><i class="fab fa-telegram"></i></a>
+        <a href="https://instagram.com/yugendub"><i class="fab fa-instagram"></i></a>
+        <a href="https://youtube.com/yugendub"><i class="fab fa-youtube"></i></a>
+        <a href="https://twitter.com/yugendub"><i class="fab fa-twitter"></i></a>
+      </div>
+
+      <div class="footer-links">
+        <a href="#">Biz haqimizda</a>
+        <a href="#">Aloqa</a>
+        <a href="#">Foydalanish shartlari</a>
+        <a href="#">Maxfiylik siyosati</a>
+      </div>
+
+      <p class="copyright">© 2025 YugenDub. Barcha huquqlar himoyalangan.</p>
+    </div>
+  </footer>
+
+  <!-- Login Modal -->
+  <div class="modal" id="login-modal">
+    <div class="modal-content">
+      <button class="close-modal" id="close-login">
+        <i class="fas fa-times"></i>
+      </button>
+      <h2 class="modal-title">Kirish</h2>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" required>
+        </div>
+        <div class="form-group">
+          <label for="login-password">Parol</label>
+          <input type="password" id="login-password" required>
+        </div>
+        <button type="submit" class="submit-btn">Kirish</button>
+      </form>
+      <div class="form-footer">
+        Akkauntingiz yo'qmi? <a href="#" id="show-register">Ro'yxatdan o'tish</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div class="modal" id="register-modal">
+    <div class="modal-content">
+      <button class="close-modal" id="close-register">
+        <i class="fas fa-times"></i>
+      </button>
+      <h2 class="modal-title">Ro'yxatdan o'tish</h2>
+      <form id="register-form">
+        <div class="form-group">
+          <label for="register-name">Ism</label>
+          <input type="text" id="register-name" required>
+        </div>
+        <div class="form-group">
+          <label for="register-email">Email</label>
+          <input type="email" id="register-email" required>
+        </div>
+        <div class="form-group">
+          <label for="register-password">Parol</label>
+          <input type="password" id="register-password" required>
+        </div>
+        <div class="form-group">
+          <label for="register-confirm">Parolni tasdiqlang</label>
+          <input type="password" id="register-confirm" required>
+        </div>
+        <button type="submit" class="submit-btn">Ro'yxatdan o'tish</button>
+      </form>
+      <div class="form-footer">
+        Akkauntingiz bormi? <a href="#" id="show-login">Kirish</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // User data
+    let users = JSON.parse(localStorage.getItem('users')) || [
+      { id: 1, name: "Admin", email: "admin@yugendub.com", password: "admin123", isAdmin: true }
+    ];
+
+    let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+
+    // DOM Elements
+    const favoritesContainer = document.getElementById('favorites-container');
+    const emptyState = document.getElementById('empty-state');
+    const searchInput = document.getElementById('search');
+    const loginBtn = document.getElementById('login-btn');
+    const registerBtn = document.getElementById('register-btn');
+    const loginModal = document.getElementById('login-modal');
+    const registerModal = document.getElementById('register-modal');
+    const closeLogin = document.getElementById('close-login');
+    const closeRegister = document.getElementById('close-register');
+    const showRegister = document.getElementById('show-register');
+    const showLogin = document.getElementById('show-login');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const closeMenu = document.getElementById('close-menu');
+    const overlay = document.getElementById('overlay');
+    const adminLink = document.getElementById('admin-link');
+    const mobileAdminLink = document.getElementById('mobile-admin-link');
+    const mobileLoginBtn = document.getElementById('mobile-login-btn');
+    const mobileRegisterBtn = document.getElementById('mobile-register-btn');
+    const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+
+    // Show toast notification
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i> ${message}`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Load favorites
+    function loadFavorites() {
+      favoritesContainer.innerHTML = '';
+      // Filter out invalid favorites
+      favorites = favorites.filter(fav => fav && fav.id && fav.name && fav.genre && fav.desc && fav.image);
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+
+      if (favorites.length === 0) {
+        emptyState.style.display = 'block';
+        return;
+      }
+      emptyState.style.display = 'none';
+      favorites.forEach(anime => {
+        favoritesContainer.innerHTML += `
+          <div class="anime-card" data-id="${anime.id}">
+            <img src="${anime.image}" alt="${anime.name}" class="anime-img">
+            <div class="anime-info">
+              <h3 class="anime-title">${anime.name}</h3>
+              <span class="anime-genre">${anime.genre}</span>
+              <p class="anime-desc">${anime.desc}</p>
+              <div class="anime-actions">
+                <button class="remove-btn" data-id="${anime.id}">
+                  <i class="fas fa-trash"></i>
+                </button>
+                <button class="view-btn">Ko'rish</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Remove favorite
+    function removeFavorite(animeId) {
+      const anime = favorites.find(fav => fav.id === animeId);
+      if (!anime) return;
+      favorites = favorites.filter(fav => fav.id !== animeId);
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      loadFavorites();
+      showToast(`${anime.name} sevimlilardan o'chirildi!`, 'warning');
+    }
+
+    // Toggle modal
+    function toggleModal(modal) {
+      modal.classList.toggle('active');
+      overlay.classList.toggle('active');
+      document.body.style.overflow = modal.classList.contains('active') ? 'hidden' : 'auto';
+    }
+
+    // Handle login
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      const user = users.find(u => u.email === email && u.password === password);
+      if (user) {
+        currentUser = user;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        toggleModal(loginModal);
+        checkAuth();
+        showToast('Kirish muvaffaqiyatli!', 'success');
+      } else {
+        showToast('Email yoki parol xato!', 'error');
+      }
+    }
+
+    // Handle register
+    function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('register-name').value;
+      const email = document.getElementById('register-email').value;
+      const password = document.getElementById('register-password').value;
+      const confirm = document.getElementById('register-confirm').value;
+
+      if (password !== confirm) {
+        showToast('Parollar mos emas!', 'error');
+        return;
+      }
+
+      if (users.some(u => u.email === email)) {
+        showToast('Bu email allaqachon ro\'yxatdan o\'tgan!', 'error');
+        return;
+      }
+
+      const newUser = {
+        id: users.length + 1,
+        name,
+        email,
+        password,
+        isAdmin: false
+      };
+
+      users.push(newUser);
+      currentUser = newUser;
+      localStorage.setItem('users', JSON.stringify(users));
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      toggleModal(registerModal);
+      checkAuth();
+      showToast('Ro\'yxatdan o\'tish muvaffaqiyatli!', 'success');
+    }
+
+    // Handle logout
+    function handleLogout() {
+      currentUser = null;
+      localStorage.removeItem('currentUser');
+      checkAuth();
+      showToast('Chiqish muvaffaqiyatli!', 'success');
+    }
+
+    // Check auth status
+    function checkAuth() {
+      const authButtons = document.querySelector('.auth-buttons');
+      if (currentUser) {
+        loginBtn.style.display = 'none';
+        registerBtn.style.display = 'none';
+        mobileLoginBtn.style.display = 'none';
+        mobileRegisterBtn.style.display = 'none';
+        mobileLogoutBtn.style.display = 'block';
+
+        authButtons.innerHTML = `
+          <button class="auth-btn profile-btn">
+            <i class="fas fa-user"></i> ${currentUser.name}
+          </button>
+          <button class="auth-btn logout-btn" id="logout-btn">Chiqish</button>
+        `;
+        document.getElementById('logout-btn').addEventListener('click', handleLogout);
+      } else {
+        loginBtn.style.display = 'block';
+        registerBtn.style.display = 'block';
+        mobileLoginBtn.style.display = 'block';
+        mobileRegisterBtn.style.display = 'block';
+        mobileLogoutBtn.style.display = 'none';
+
+        authButtons.innerHTML = `
+          <button class="auth-btn login-btn" id="login-btn">Kirish</button>
+          <button class="auth-btn register-btn" id="register-btn">Ro'yxatdan o'tish</button>
+        `;
+      }
+    }
+
+    // Filter favorites
+    function filterFavorites() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const cards = document.querySelectorAll('.anime-card');
+
+      cards.forEach(card => {
+        const title = card.querySelector('.anime-title').textContent.toLowerCase();
+        const genre = card.querySelector('.anime-genre').textContent.toLowerCase();
+        card.style.display = (title.includes(searchTerm) || genre.includes(searchTerm)) ? 'block' : 'none';
+      });
+    }
+
+    // Open mobile menu
+    function openMobileMenu() {
+      mobileMenu.classList.add('active');
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Close mobile menu
+    function closeMobileMenu() {
+      mobileMenu.classList.remove('active');
+      overlay.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    }
+
+    // Initialize
+    function init() {
+      loadFavorites();
+      checkAuth();
+
+      // Event listeners
+      searchInput.addEventListener('input', filterFavorites);
+      loginBtn.addEventListener('click', () => toggleModal(loginModal));
+      registerBtn.addEventListener('click', () => toggleModal(registerModal));
+      mobileLoginBtn.addEventListener('click', () => { closeMobileMenu(); toggleModal(loginModal); });
+      mobileRegisterBtn.addEventListener('click', () => { closeMobileMenu(); toggleModal(registerModal); });
+      mobileLogoutBtn.addEventListener('click', () => { closeMobileMenu(); handleLogout(); });
+      closeLogin.addEventListener('click', () => toggleModal(loginModal));
+      closeRegister.addEventListener('click', () => toggleModal(registerModal));
+      showRegister.addEventListener('click', (e) => { e.preventDefault(); toggleModal(loginModal); toggleModal(registerModal); });
+      showLogin.addEventListener('click', (e) => { e.preventDefault(); toggleModal(registerModal); toggleModal(loginModal); });
+      loginForm.addEventListener('submit', handleLogin);
+      registerForm.addEventListener('submit', handleRegister);
+      hamburger.addEventListener('click', openMobileMenu);
+      closeMenu.addEventListener('click', closeMobileMenu);
+      overlay.addEventListener('click', closeMobileMenu);
+      adminLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (currentUser && currentUser.isAdmin) {
+          showToast('Admin paneliga o\'tish!', 'success');
+        } else {
+          showToast('Siz admin emassiz!', 'error');
+        }
+      });
+      mobileAdminLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeMobileMenu();
+        if (currentUser && currentUser.isAdmin) {
+          showToast('Admin paneliga o\'tish!', 'success');
+        } else {
+          showToast('Siz admin emassiz!', 'error');
+        }
+      });
+
+      // Favorites actions
+      favoritesContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('remove-btn') || e.target.parentElement.classList.contains('remove-btn')) {
+          const animeId = parseInt(e.target.getAttribute('data-id') || e.target.parentElement.getAttribute('data-id'));
+          removeFavorite(animeId);
+        }
+      });
+    }
+
+    // Start app
+    init();
+  </script>
+</body>
+</html>
